@@ -1,0 +1,115 @@
+ENGINE V3 — FINAL SCHEMA TREE (DENGAN L0 INGEST)
+Ini versi final + lengkap + konsisten dengan workflow.
+ROOT
+Salin kode
+
+engine-v3/
+  README.md
+  package.json
+  tsconfig.json
+THREAD L0 — RAW INGEST (RPC / ANKR / EVENT FEED)
+👉 Ini tempat semua ankr_* dan polling.
+👉 Ini SEBELUM snapshot.
+👉 Ini bukan snapshot, bukan lifecycle.
+Salin kode
+
+engine-v3/
+  ingest/
+    ingest.md              # THREAD L0 SPEC
+
+    ankrPolling.ts         # poll blocks, logs, pool state
+    rpcClient.ts           # RPC wrapper (Ankr)
+    eventDecoder.ts        # decode Swap/Mint/Burn/Sync
+    blockTracker.ts        # track latest block + lag
+    poolRegistry.ts        # track watched V3 pools
+Responsibility L0 (Hard Lock)
+Ambil data mentah dari chain
+Decode event
+Normalisasi event
+Emit raw stream
+❌ Tidak bikin snapshot
+❌ Tidak bikin lifecycle
+❌ Tidak bikin engine state
+THREAD B — SNAPSHOT ENGINE (L1.5)
+(Berdasarkan L0 ingest)
+Salin kode
+
+engine-v3/
+  engine/
+    snapshot/
+      snapshot.md
+
+      snapshotCollector.ts  # build LP snapshot from raw ingest
+      bucketizer.ts         # Near/Mid/Far bands
+      snapshotCache.ts      # rolling memory
+THREAD C — LIFECYCLE ENGINE
+Salin kode
+
+engine-v3/
+  engine/
+    lifecycle/
+      lifecycle.md
+
+      anchorLifecycle.ts
+      rangeLifecycle.ts
+      structureGraph.ts
+THREAD D — WORKFLOW + CHECKPOINT
+Salin kode
+
+engine-v3/
+  engine/
+    workflow/
+      workflow.md
+
+      engineController.ts
+      checkpoint15m.ts
+      alertEmitter.ts
+THREAD A — MOCK + UI
+Salin kode
+
+engine-v3/
+  mock/
+    mock.md
+
+    server/
+      server.js
+      routes.js
+      loader.js
+
+    scenarios/
+      real-accum.json
+      fake-accum.json
+      exhaustion.json
+      structural-dump.json
+Salin kode
+
+engine-v3/
+  ui/
+    src/
+      App.tsx
+
+      components/
+        StructuralCommandScreen.tsx
+        TopBar.tsx
+        HeatmapPanel.tsx
+        AnchorPanel.tsx
+        RangePanel.tsx
+        EngineModePanel.tsx
+        LifecycleTimeline.tsx
+        ReasonPanel.tsx
+
+      services/
+        mockApi.ts
+
+      types/
+        scenario.ts
+THREAD E — REPLAY (OPTIONAL)
+Salin kode
+
+engine-v3/
+  replay/
+    replay.md
+
+    eventReplayer.ts
+    snapshotReplayer.ts
+    lifecycleReplayer.ts
